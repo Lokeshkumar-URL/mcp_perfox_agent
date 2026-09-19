@@ -1,0 +1,17 @@
+services:
+  mcp-server:
+    build: .
+    restart: unless-stopped
+    init: true
+    ports:
+      - "127.0.0.1:3005:3005"
+    environment:
+      GHL_PRIVATE_INTEGRATION_TOKEN: ${GHL_PRIVATE_INTEGRATION_TOKEN:?Set GHL_PRIVATE_INTEGRATION_TOKEN in .env}
+      GHL_CALENDAR_ID: ${GHL_CALENDAR_ID:-}
+      GHL_LOCATION_ID: ${GHL_LOCATION_ID:-}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3005/mcp/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
