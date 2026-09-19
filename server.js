@@ -4,6 +4,7 @@ import { mcpTools } from './mcp-server.js';
 
 const app = express();
 const PORT = process.env.PORT || 3005;
+const MCP_PROTOCOL_VERSION = '2025-03-26';
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,10 @@ app.get('/', (req, res) => {
     healthEndpoint: '/mcp/health',
     message: 'Send MCP JSON-RPC requests to /mcp using POST.'
   });
+});
+
+app.get('/mcp', (req, res) => {
+  res.set('Allow', 'POST').status(405).end();
 });
 
 app.post('/mcp', async (req, res) => {
@@ -33,10 +38,16 @@ app.post('/mcp', async (req, res) => {
     let result;
 
     if (method === 'initialize') {
-      res.json({ jsonrpc: '2.0', result: { protocolVersion: '2024-11-05', capabilities: { tools: {} }, serverInfo: { name: 'url-factory-mcp', version: '1.0.0' } }, id });
+      res.json({ jsonrpc: '2.0', result: { protocolVersion: MCP_PROTOCOL_VERSION, capabilities: { tools: {} }, serverInfo: { name: 'url-factory-mcp', version: '1.0.0' } }, id });
       return;
     }
-    if (method === 'tools/list') {
+    if (method === 'notifications/initialized') {
+      res.status(202).end();
+      return;
+    }
+    if (method === 'ping') {
+      result = {};
+    } else if (method === 'tools/list') {
       const tools = Object.entries(mcpTools).map(([name, tool]) => ({
         name,
         description: tool.description,
