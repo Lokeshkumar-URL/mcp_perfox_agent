@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      - "127.0.0.1:3005:3005"
+      - "3005:3005"
     environment:
       GHL_PRIVATE_INTEGRATION_TOKEN: ${GHL_PRIVATE_INTEGRATION_TOKEN:?Set GHL_PRIVATE_INTEGRATION_TOKEN in .env}
       GHL_CALENDAR_ID: ${GHL_CALENDAR_ID:-}
